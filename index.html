@@ -442,9 +442,17 @@ else shelfCount = 2;
     function calculateOneRack(type, isStarting, height, qty) {
       if (qty <= 0) return null;
       const spec = getSpec(type, height, isStarting);
-      return { typeLabel: `${type === 'single' ? 'single' : 'Double'} ${isStarting ? 'Starting' : 'Join'}`, height, qty,
-        kaki: spec.kaki * qty, mesh: spec.mesh * qty, tatakan: spec.tatakan * qty,
-        shelf28: spec.Papan28 * qty, Papan33: spec.shelf33 * qty, baut: spec.baut * qty };
+      return {
+  typeLabel: `${type === 'single' ? 'single' : 'Double'} ${isStarting ? 'Starting' : 'Join'}`,
+  height,
+  qty,
+  kaki: spec.kaki * qty,
+  mesh: spec.mesh * qty,
+  tatakan: spec.tatakan * qty,
+  Papan28: spec.Papan28 * qty,
+  Papan33: spec.Papan33 * qty,
+  baut: spec.baut * qty
+};
     }
     
     function getAllRackData() {
@@ -464,7 +472,7 @@ else shelfCount = 2;
     function renderTable(data) {
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '';
-      let total = { qty:0, kaki:0, mesh:0, tatakan:0, shelf28:0, shelf33:0, baut:0 };
+      let total = { qty:0, kaki:0, mesh:0, tatakan:0, Papan28:0, Papan33:0, baut:0 };
       for (let d of data) {
         const row = tbody.insertRow();
         row.insertCell(0).innerText = d.typeLabel;
@@ -473,11 +481,12 @@ else shelfCount = 2;
         row.insertCell(3).innerText = d.kaki;
         row.insertCell(4).innerText = d.mesh;
         row.insertCell(5).innerText = d.tatakan;
-        row.insertCell(6).innerText = d.shelf28;
-        row.insertCell(7).innerText = d.shelf33;
+        row.insertCell(6).innerText = d.Papan28;
+      row.insertCell(7).innerText = d.Papan33;
         row.insertCell(8).innerText = d.baut;
         total.qty += d.qty; total.kaki += d.kaki; total.mesh += d.mesh; total.tatakan += d.tatakan;
-        total.shelf28 += d.shelf28; total.shelf33 += d.shelf33; total.baut += d.baut;
+        total.Papan28 += d.Papan28;
+total.Papan33 += d.Papan33; total.baut += d.baut;
       }
       const tr = tbody.insertRow();
       tr.className = 'total-row';
@@ -487,8 +496,8 @@ else shelfCount = 2;
       tr.insertCell(3).innerText = total.kaki;
       tr.insertCell(4).innerText = total.mesh;
       tr.insertCell(5).innerText = total.tatakan;
-      tr.insertCell(6).innerText = total.shelf28;
-      tr.insertCell(7).innerText = total.shelf33;
+      tr.insertCell(6).innerText = total.Papan28;
+tr.insertCell(7).innerText = total.Papan33;
       tr.insertCell(8).innerText = total.baut;
     }
     
@@ -676,7 +685,7 @@ scene.add(currentGroup);
     if (r.qty > 0) {
       message += `${r.typeLabel} ${r.height}cm x ${r.qty}\n`;
       message += `Kaki: ${r.kaki}, Mesh: ${r.mesh}, Tatakan: ${r.tatakan}\n`;
-      message += `Shelf28: ${r.shelf28}, Shelf33: ${r.shelf33}, Baut: ${r.baut}\n\n`;
+      message += `Papan 28cm: ${r.Papan28}, Papan 33cm: ${r.Papan33}, Baut: ${r.baut}\n\n`;
     }
   });
 
