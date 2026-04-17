@@ -427,17 +427,24 @@ else shelfCount = 2;
     };
     
     function getSpec(type, height, isStarting) {
-      const key = (type === 'single' ? 'single' : 'double') + height;
-      const spec = specTable[key];
-      return { kaki: isStarting ? spec.kakiStart : spec.kakiJoin, mesh: spec.mesh, tatakan: spec.tatakan, shelf28: spec.shelf28, shelf33: spec.shelf33, baut: spec.baut };
-    }
+  const key = (type === 'single' ? 'single' : 'double') + height;
+  const spec = specTable[key];
+  return {
+    kaki: isStarting ? spec.kakiStart : spec.kakiJoin,
+    mesh: spec.mesh,
+    tatakan: spec.tatakan,
+    Papan28: spec.Papan28,
+    Papan33: spec.Papan33,
+    baut: spec.baut
+  };
+}
     
     function calculateOneRack(type, isStarting, height, qty) {
       if (qty <= 0) return null;
       const spec = getSpec(type, height, isStarting);
       return { typeLabel: `${type === 'single' ? 'single' : 'Double'} ${isStarting ? 'Starting' : 'Join'}`, height, qty,
         kaki: spec.kaki * qty, mesh: spec.mesh * qty, tatakan: spec.tatakan * qty,
-        shelf28: spec.shelf28 * qty, shelf33: spec.shelf33 * qty, baut: spec.baut * qty };
+        shelf28: spec.Papan28 * qty, Papan33: spec.shelf33 * qty, baut: spec.baut * qty };
     }
     
     function getAllRackData() {
