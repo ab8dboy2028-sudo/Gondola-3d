@@ -705,12 +705,23 @@ scene.add(currentGroup);
       total.tatakan += r.tatakan;
       total.Papan28 += r.Papan28;
       total.Papan33 += r.Papan33;
-      total.baut += r.baut;    }
+      total.baut += r.baut;
+    }
   });
 
+  message += '📌 Total Keseluruhan\n';
+  message += `Kaki: ${total.kaki}\n`;
+  message += `Wire Mesh: ${total.mesh}\n`;
+  message += `Tatakan: ${total.tatakan}\n`;
+  message += `Papan 28cm: ${total.Papan28}\n`;
+  message += `Papan 33cm: ${total.Papan33}\n`;
+  message += `Baut: ${total.baut}\n`;
+
   window.open(
-}
-    
+    'https://wa.me/?text=' + encodeURIComponent(message),
+    '_blank'
+  );
+}    
     window.updateAll = updateAll;
 window.shareToWhatsApp = shareToWhatsApp;
 setTimeout(updateAll, 200);
