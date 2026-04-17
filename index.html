@@ -680,13 +680,23 @@ scene.add(currentGroup);
   const rows = getAllRackData();
 
   let total = {
-    kaki: 0,
-    mesh: 0,
-    tatakan: 0,
-    Papan28: 0,
-    Papan33: 0,
-    baut: 0
-  };
+  kakiSingle120: 0,
+  kakiSingle150: 0,
+  kakiSingle180: 0,
+  kakiSingle200: 0,
+
+  kakiDouble120: 0,
+  kakiDouble150: 0,
+  kakiDouble180: 0,
+  kakiDouble200: 0,
+
+  mesh: 0,
+  tatakan: 0,
+  Papan28: 0,
+  Papan33: 0,
+  baut: 0
+};
+
 
   let message = '📦 Daftar Aksesoris Gondola\n\n';
 
@@ -700,23 +710,42 @@ scene.add(currentGroup);
       message += `Papan 33cm: ${r.Papan33}\n`;
       message += `Baut: ${r.baut}\n\n`;
 
-      total.kaki += r.kaki;
-      total.mesh += r.mesh;
-      total.tatakan += r.tatakan;
-      total.Papan28 += r.Papan28;
-      total.Papan33 += r.Papan33;
-      total.baut += r.baut;
+      if (r.typeLabel.toLowerCase().includes('single')) {
+  if (r.height === 120) total.kakiSingle120 += r.kaki;
+  if (r.height === 150) total.kakiSingle150 += r.kaki;
+  if (r.height === 180) total.kakiSingle180 += r.kaki;
+  if (r.height === 200) total.kakiSingle200 += r.kaki;
+} else {
+  if (r.height === 120) total.kakiDouble120 += r.kaki;
+  if (r.height === 150) total.kakiDouble150 += r.kaki;
+  if (r.height === 180) total.kakiDouble180 += r.kaki;
+  if (r.height === 200) total.kakiDouble200 += r.kaki;
+}
+
+total.mesh += r.mesh;
+total.tatakan += r.tatakan;
+total.Papan28 += r.Papan28;
+total.Papan33 += r.Papan33;
+total.baut += r.baut;
     }
   });
 
   message += '📌 Total Keseluruhan\n';
-  message += `Kaki: ${total.kaki}\n`;
-  message += `Wire Mesh: ${total.mesh}\n`;
-  message += `Tatakan: ${total.tatakan}\n`;
-  message += `Papan 28cm: ${total.Papan28}\n`;
-  message += `Papan 33cm: ${total.Papan33}\n`;
-  message += `Baut: ${total.baut}\n`;
+if (total.kakiSingle120 > 0) message += `Kaki Single 120cm : ${total.kakiSingle120}\n`;
+if (total.kakiSingle150 > 0) message += `Kaki Single 150cm : ${total.kakiSingle150}\n`;
+if (total.kakiSingle180 > 0) message += `Kaki Single 180cm : ${total.kakiSingle180}\n`;
+if (total.kakiSingle200 > 0) message += `Kaki Single 200cm : ${total.kakiSingle200}\n`;
 
+if (total.kakiDouble120 > 0) message += `Kaki Double 120cm : ${total.kakiDouble120}\n`;
+if (total.kakiDouble150 > 0) message += `Kaki Double 150cm : ${total.kakiDouble150}\n`;
+if (total.kakiDouble180 > 0) message += `Kaki Double 180cm : ${total.kakiDouble180}\n`;
+if (total.kakiDouble200 > 0) message += `Kaki Double 200cm : ${total.kakiDouble200}\n`;
+
+if (total.mesh > 0) message += `Wire Mesh : ${total.mesh}\n`;
+if (total.tatakan > 0) message += `Tatakan : ${total.tatakan}\n`;
+if (total.Papan28 > 0) message += `Papan 28cm : ${total.Papan28}\n`;
+if (total.Papan33 > 0) message += `Papan 33cm : ${total.Papan33}\n`;
+if (total.baut > 0) message += `Baut : ${total.baut}\n`;
   const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(waUrl, '_blank');
 }
