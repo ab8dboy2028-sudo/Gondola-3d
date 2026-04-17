@@ -717,11 +717,10 @@ scene.add(currentGroup);
   message += `Papan 33cm: ${total.Papan33}\n`;
   message += `Baut: ${total.baut}\n`;
 
-  window.open(
-    'https://wa.me/?text=' + encodeURIComponent(message),
-    '_blank'
-  );
-}    
+  const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+  window.open(waUrl, '_blank');
+}
+    
     window.updateAll = updateAll;
 window.shareToWhatsApp = shareToWhatsApp;
 setTimeout(updateAll, 200);
