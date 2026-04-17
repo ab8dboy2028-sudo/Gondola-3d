@@ -416,14 +416,14 @@ else shelfCount = 2;
     
     // ========== 配件計算 (依您標準規格修正) ==========
     const specTable = {
-      single120: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 6, shelf28: 3, shelf33: 1, baut: 4 },
-      single150: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 6, shelf28: 3, shelf33: 1, baut: 4 },  // 修正
-      single180: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 8, shelf28: 4, shelf33: 1, baut: 4 },
-      single200: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 8, shelf28: 4, shelf33: 1, baut: 4 },
-      double120: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 12, shelf28: 6, shelf33: 2, baut: 4 },
-      double150: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 12, shelf28: 6, shelf33: 2, baut: 4 },
-      double180: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 16, shelf28: 8, shelf33: 2, baut: 4 },
-      double200: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 16, shelf28: 8, shelf33: 2, baut: 4 }
+      single120: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 6, Papan28: 3, Papan33: 1, baut: 4 },
+      single150: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 6, Papan28: 3, Papan33: 1, baut: 4 },  // 修正
+      single180: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 8, Papan28: 4, Papan33: 1, baut: 4 },
+      single200: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 8, Papan28: 4, Papan33: 1, baut: 4 },
+      double120: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 12, Papan28: 6, Papan33: 2, baut: 4 },
+      double150: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 12, Papan28: 6, Papan33: 2, baut: 4 },
+      double180: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 16, Papan28: 8, Papan33: 2, baut: 4 },
+      double200: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 16, Papan28: 8, Papan33: 2, baut: 4 }
     };
     
     function getSpec(type, height, isStarting) {
