@@ -85,8 +85,8 @@
     
     <button class="btn-calc" onclick="updateAll()">✨ Perbarui Rak Gondola & Hitung Aksesoris</button>
     <button style="background:#25D366;color:white;padding:10px;border-radius:12px;margin-bottom:12px;"
-onclick="window.open('https://wa.me/6281291140243','_blank')">
-  💬  WhatsApp
+onclick="shareToWhatsApp()">
+  💬 Bagikan ke WhatsApp
 </button>
     
     <div class="result-table">
@@ -659,9 +659,29 @@ scene.add(currentGroup);
       renderer.setSize(w, h);
       labelRenderer.setSize(w, h);
     });
+
+   function shareToWhatsApp() {
+  const rows = getAllRackData();
+
+  let message = '📦 Daftar Aksesoris Gondola\n\n';
+
+  rows.forEach(r => {
+    if (r.qty > 0) {
+      message += `${r.typeLabel} ${r.height}cm x ${r.qty}\n`;
+      message += `Kaki: ${r.kaki}, Mesh: ${r.mesh}, Tatakan: ${r.tatakan}\n`;
+      message += `Shelf28: ${r.shelf28}, Shelf33: ${r.shelf33}, Baut: ${r.baut}\n\n`;
+    }
+  });
+
+  window.open(
+    'https://wa.me/?text=' + encodeURIComponent(message),
+    '_blank'
+  );
+}
     
     window.updateAll = updateAll;
-    setTimeout(updateAll, 200);
+window.shareToWhatsApp = shareToWhatsApp;
+setTimeout(updateAll, 200);
   </script>
 </body>
 </html>

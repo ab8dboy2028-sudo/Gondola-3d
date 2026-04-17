@@ -1,0 +1,5 @@
+改完代碼打上這三行可以網頁更新
+
+git add .
+git commit -m "latest website update"
+git push
