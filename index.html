@@ -679,24 +679,36 @@ scene.add(currentGroup);
    function shareToWhatsApp() {
   const rows = getAllRackData();
 
+  let total = {
+    kaki: 0,
+    mesh: 0,
+    tatakan: 0,
+    Papan28: 0,
+    Papan33: 0,
+    baut: 0
+  };
+
   let message = '📦 Daftar Aksesoris Gondola\n\n';
 
   rows.forEach(r => {
     if (r.qty > 0) {
       message += `${r.typeLabel} ${r.height}cm x ${r.qty}\n`;
       message += `Kaki: ${r.kaki}\n`;
-message += `Wire Mesh: ${r.mesh}\n`;
-message += `Tatakan: ${r.tatakan}\n`;
-message += `Papan 28cm: ${r.Papan28}\n`;
-message += `Papan 33cm: ${r.Papan33}\n`;
-message += `Baut: ${r.baut}\n\n`;
-    }
+      message += `Wire Mesh: ${r.mesh}\n`;
+      message += `Tatakan: ${r.tatakan}\n`;
+      message += `Papan 28cm: ${r.Papan28}\n`;
+      message += `Papan 33cm: ${r.Papan33}\n`;
+      message += `Baut: ${r.baut}\n\n`;
+
+      total.kaki += r.kaki;
+      total.mesh += r.mesh;
+      total.tatakan += r.tatakan;
+      total.Papan28 += r.Papan28;
+      total.Papan33 += r.Papan33;
+      total.baut += r.baut;    }
   });
 
   window.open(
-    'https://wa.me/?text=' + encodeURIComponent(message),
-    '_blank'
-  );
 }
     
     window.updateAll = updateAll;
