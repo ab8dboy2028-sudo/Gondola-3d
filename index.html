@@ -684,8 +684,12 @@ scene.add(currentGroup);
   rows.forEach(r => {
     if (r.qty > 0) {
       message += `${r.typeLabel} ${r.height}cm x ${r.qty}\n`;
-      message += `Kaki: ${r.kaki}, Mesh: ${r.mesh}, Tatakan: ${r.tatakan}\n`;
-      message += `Papan 28cm: ${r.Papan28}, Papan 33cm: ${r.Papan33}, Baut: ${r.baut}\n\n`;
+      message += `Kaki: ${r.kaki}\n`;
+message += `Wire Mesh: ${r.mesh}\n`;
+message += `Tatakan: ${r.tatakan}\n`;
+message += `Papan 28cm: ${r.Papan28}\n`;
+message += `Papan 33cm: ${r.Papan33}\n`;
+message += `Baut: ${r.baut}\n\n`;
     }
   });
 
