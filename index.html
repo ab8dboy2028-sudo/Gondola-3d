@@ -483,25 +483,7 @@ onclick="contactOwnerWhatsApp()">
         currentDoubleZ += doubleRowSpacing;
       }
 
-      // 多出來的 Single Starting，不增加新的 Double 排，
-      // 而是補到現有 Double 排上面
-      const extraSingle = Math.max(0, ss - 2);
-
-      for (let i = 0; i < extraSingle; i++) {
-        if (doubleRows.length === 0) {
-          if (currentDoubleZ > middleBottom) break;
-
-          doubleRows.push({
-            x: startX,
-            z: currentDoubleZ
-          });
-
-          currentDoubleZ += doubleRowSpacing;
-        } else {
-          doubleRows[i % doubleRows.length].x += rackLen;
-        }
-      }   
-
+      
    doubleRows.forEach((row) => {
         const rack = createGondolaRack('double', dH);
         rack.position.set(row.x, 0, row.z);
@@ -523,68 +505,73 @@ onclick="contactOwnerWhatsApp()">
       }
       
             // Single 永遠在前後兩邊
-      const rowSpacing = 0.55 + walkway;
-      const rows = [];
+const rows = [];
 
-      if (ss >= 1) {
-        rows.push({
-          x: startX,
-          z: singleFrontZ
-        });
-      }
+if (ss > 0) {
+  rows.push({
+    x: startX,
+    z: singleFrontZ,
+    count: Math.ceil(ss / 2)
+  });
+}
 
-      if (ss >= 2) {
-        rows.push({
-          x: startX,
-          z: singleBackZ
-        });
-      }
+if (ss > 1) {
+  rows.push({
+    x: startX,
+    z: singleBackZ,
+    count: Math.floor(ss / 2)
+  });
+}
 
-  rows.forEach((row, index) => {
-        const rack = createGondolaRack('single', sH);
-        rack.position.set(row.x, 0, row.z);
+// Single Starting
+rows.forEach((row, index) => {
+  for (let n = 0; n < row.count; n++) {
+    const rack = createGondolaRack('single', sH);
 
-        // 前面那排要朝店內
-        if (index === 0) {
-          rack.rotation.y = 0;
-        }
+    rack.position.set(row.x, 0, row.z);
 
-        // 後面那排要朝店內
-        if (index === 1) {
-          rack.rotation.y = Math.PI;
-        }
+    if (index === 0) {
+      rack.rotation.y = 0;
+    }
 
-        addRotateHandle(rack, sH);
-        group.add(rack);
-        draggableRacks.push(rack);
+    if (index === 1) {
+      rack.rotation.y = Math.PI;
+    }
 
-        row.x += rackLen;
-      });
-      for (let i = 0; i < sj; i++) {
-        if (rows.length === 0) break;
+    addRotateHandle(rack, sH);
+    group.add(rack);
+    draggableRacks.push(rack);
 
-        const rowIndex = i % rows.length;
-        const row = rows[rowIndex];
+    row.x += rackLen;
+  }
+});
 
-        const rack = createGondolaRack('single', sH);
+// Single Join
+for (let i = 0; i < sj; i++) {
+  if (rows.length === 0) break;
 
-        row.x -= (rackLen - joinOffset);
-        rack.position.set(row.x, 0, row.z);
+  const rowIndex = i % rows.length;
+  const row = rows[rowIndex];
 
-        // Join 跟著該排 Starting 的方向
-        if (rowIndex === 0) {
-          rack.rotation.y = 0;
-        }
+  const rack = createGondolaRack('single', sH);
 
-        if (rowIndex === 1) {
-          rack.rotation.y = Math.PI;
-        }
-        addRotateHandle(rack, sH);
-        group.add(rack);
-        draggableRacks.push(rack);
+  row.x -= (rackLen - joinOffset);
+  rack.position.set(row.x, 0, row.z);
 
-        row.x += joinOffset;
-      }      
+  if (rowIndex === 0) {
+    rack.rotation.y = 0;
+  }
+
+  if (rowIndex === 1) {
+    rack.rotation.y = Math.PI;
+  }
+
+  addRotateHandle(rack, sH);
+  group.add(rack);
+  draggableRacks.push(rack);
+
+  row.x += joinOffset;
+}
       const floorY = -0.92;
       const borderPts = [
         new THREE.Vector3(-lengthM/2, floorY, -widthM/2),
