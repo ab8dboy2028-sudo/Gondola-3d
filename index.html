@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Pekanbaru Display · Gondola 超商貨架 3D</title>
+  <title>Pekanbaru Display · Rak Gondola 3D + Auto Layout</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a1a; overflow: hidden; }
@@ -36,13 +36,13 @@
     .rack-card input, .rack-card select { margin-top: 4px; padding: 6px 8px; font-size: 11px; }
     
     .result-table {
-  margin-top: 16px;
-  background: rgba(30, 30, 30, 0.9);
-  border-radius: 16px;
-  overflow-x: auto;
-  font-size: 11px;
-  color: white;
-}
+      margin-top: 16px;
+      background: rgba(30, 30, 30, 0.9);
+      border-radius: 16px;
+      overflow-x: auto;
+      font-size: 11px;
+      color: white;
+    }
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 8px 4px; text-align: center; border-bottom: 1px solid #3a3a3a; }
     th { background: #ffca2822; color: #ffca28; }
@@ -51,6 +51,7 @@
     
     .note-info { background: #ffca2811; padding: 8px; border-radius: 12px; margin-top: 12px; font-size: 10px; color: #ffca28; text-align: center; }
     .btn-calc { background: #ff9800; padding: 10px; font-size: 14px; margin: 8px 0; }
+    .btn-auto { background: #2196f3; padding: 10px; font-size: 14px; margin: 8px 0; }
     .info-3d { position: fixed; bottom: 15px; left: 15px; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 20px; font-size: 11px; z-index: 10; }
     
     @media (max-width: 700px) { .control-panel { width: 340px; right: 10px; top: 10px; padding: 12px; } .config-grid { grid-template-columns: 1fr; } }
@@ -61,7 +62,7 @@
   
   <div class="control-panel">
     <h1>🏪 Pekanbaru Display</h1>
-    <div class="sub">Gondola 超商貨架 3D | Sistem Konfigurasi Rak</div>
+    <div class="sub">Rak Gondola Minimarket 3D | Sistem Konfigurasi Rak</div>
     
     <div class="input-row">
       <div class="input-group"><label>📏 Panjang (m)</label><input id="length" type="number" step="0.5" value="10.0"></div>
@@ -83,27 +84,33 @@
       </div>
     </div>
     
+    <button class="btn-auto" onclick="autoGenerateLayout()">🤖 Auto Konfigurasi (Coba Lagi)</button>
     <button class="btn-calc" onclick="updateAll()">✨ Perbarui Rak Gondola & Hitung Aksesoris</button>
     <button style="background:#25D366;color:white;padding:10px;border-radius:12px;margin-bottom:12px;"
 onclick="shareToWhatsApp()">
   💬 Bagikan ke WhatsApp
+</button>
+
+<button style="background:#128C7E;color:white;padding:10px;border-radius:12px;margin-bottom:12px;"
+onclick="contactOwnerWhatsApp()">
+  📲 Hubungi Saya Langsung
 </button>
     
     <div class="result-table">
       <table id="accessoryTable">
         <thead>
           <tr>
-            <th>Jenis</th><th>Tinggi</th><th>jumlah</th><th>Kaki</th><th>wireMesh</th><th>Tatakan</th><th>Papan28</th><th>Papan33</th><th>Baut</th>
+            <th>Jenis</th><th>Tinggi</th><th>Jumlah</th><th>Kaki</th><th>wireMesh</th><th>Tatakan</th><th>Papan28</th><th>Papan33</th><th>Baut</th>
           </tr>
         </thead>
         <tbody id="tableBody">
-          <tr><td colspan="9">請點擊按鈕計算</td></tr>
+          <tr><td colspan="9">Klik tombol untuk menghitung</td></tr>
         </tbody>
       </table>
     </div>
-    <div class="note-info">🛒 Gondola 標準貨架 | 黑色方管 + 鐵網背板 + 白色層板 | 滑鼠拖曳旋轉 | 右鍵平移 | 滾輪縮放</div>
+    <div class="note-info">🛒 Rak Gondola Standar | Pipa hitam + Back panel kawat + Rak putih | Seret mouse untuk memutar | Klik kanan untuk geser | Scroll zoom</div>
   </div>
-  <div class="info-3d">🖱️ Gondola 3D - 可拖曳/旋轉/縮放</div>
+  <div class="info-3d">🖱️ Gondola 3D - Dapat diseret/diputar/diperbesar</div>
 
   <script type="importmap">
     { "imports": { "three": "https://unpkg.com/three@0.128.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/" } }
@@ -112,8 +119,8 @@ onclick="shareToWhatsApp()">
   <script type="module">
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { DragControls } from 'three/addons/controls/DragControls.js';
-import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+    import { DragControls } from 'three/addons/controls/DragControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
     
     // 初始化場景
     const container = document.getElementById('canvas-container');
@@ -140,14 +147,14 @@ import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer
     container.appendChild(labelRenderer.domElement);
     
     const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.05;
-controls.rotateSpeed = 1.0;
-controls.zoomSpeed = 1.2;
-controls.panSpeed = 0.8;
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.rotateSpeed = 1.0;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.8;
 
-let draggableRacks = [];
-let dragControls = null;
+    let draggableRacks = [];
+    let dragControls = null;
     
     // 燈光
     const ambientLight = new THREE.AmbientLight(0x404060);
@@ -166,176 +173,133 @@ let dragControls = null;
     scene.add(backLight);
     
     function addRotateHandle(rack, heightCm) {
-  // ↻ 旋轉按鈕
-  const rotateBtn = document.createElement('button');
-  rotateBtn.innerHTML = '↻';
-  rotateBtn.style.cssText = `
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    border:2px solid #ffca28;
-    background:rgba(20,20,20,0.9);
-    color:#ffca28;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
-    pointer-events:auto;
-  `;
+      const rotateBtn = document.createElement('button');
+      rotateBtn.innerHTML = '↻';
+      rotateBtn.style.cssText = `
+        width:34px;
+        height:34px;
+        border-radius:50%;
+        border:2px solid #ffca28;
+        background:rgba(20,20,20,0.9);
+        color:#ffca28;
+        font-size:18px;
+        font-weight:bold;
+        cursor:pointer;
+        pointer-events:auto;
+      `;
+      rotateBtn.onclick = (e) => {
+        e.stopPropagation();
+        rack.rotation.y += Math.PI / 2;
+      };
+      const rotateLabel = new CSS2DObject(rotateBtn);
+      rotateLabel.position.set(-0.22, heightCm / 100 + 0.22, 0);
+      rack.add(rotateLabel);
 
-  rotateBtn.onclick = (e) => {
-    e.stopPropagation();
-    rack.rotation.y += Math.PI / 2;
-  };
-
-  const rotateLabel = new CSS2DObject(rotateBtn);
-  rotateLabel.position.set(-0.22, heightCm / 100 + 0.22, 0);
-  rack.add(rotateLabel);
-
-  // ✥ 拖曳按鈕
-  const dragBtn = document.createElement('button');
-  dragBtn.innerHTML = '✥';
-  dragBtn.style.cssText = `
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    border:2px solid #66ccff;
-    background:rgba(20,20,20,0.9);
-    color:#66ccff;
-    font-size:18px;
-    font-weight:bold;
-    cursor:grab;
-    pointer-events:auto;
-  `;
-
-  const startDrag = (startX, startY) => {
-  controls.enabled = false;
-
-  const rackStartX = rack.position.x;
-  const rackStartZ = rack.position.z;
-
-  const moveRack = (currentX, currentY) => {
-    const dx = (currentX - startX) * 0.01;
-    const dz = (currentY - startY) * 0.01;
-
-    rack.position.x = rackStartX + dx;
-    rack.position.z = rackStartZ + dz;
-    rack.position.y = 0;
-  };
-
-  const onMouseMove = (ev) => {
-    moveRack(ev.clientX, ev.clientY);
-  };
-
-  const onTouchMove = (ev) => {
-    ev.preventDefault();
-
-    if (ev.touches.length > 0) {
-      moveRack(
-        ev.touches[0].clientX,
-        ev.touches[0].clientY
-      );
+      const dragBtn = document.createElement('button');
+      dragBtn.innerHTML = '✥';
+      dragBtn.style.cssText = `
+        width:34px;
+        height:34px;
+        border-radius:50%;
+        border:2px solid #66ccff;
+        background:rgba(20,20,20,0.9);
+        color:#66ccff;
+        font-size:18px;
+        font-weight:bold;
+        cursor:grab;
+        pointer-events:auto;
+      `;
+      const startDrag = (startX, startY) => {
+        controls.enabled = false;
+        const rackStartX = rack.position.x;
+        const rackStartZ = rack.position.z;
+        const moveRack = (currentX, currentY) => {
+          const dx = (currentX - startX) * 0.01;
+          const dz = (currentY - startY) * 0.01;
+          rack.position.x = rackStartX + dx;
+          rack.position.z = rackStartZ + dz;
+          rack.position.y = 0;
+        };
+        const onMouseMove = (ev) => { moveRack(ev.clientX, ev.clientY); };
+        const onTouchMove = (ev) => {
+          ev.preventDefault();
+          if (ev.touches.length > 0) moveRack(ev.touches[0].clientX, ev.touches[0].clientY);
+        };
+        const stopDrag = () => {
+          controls.enabled = true;
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', stopDrag);
+          window.removeEventListener('touchmove', onTouchMove);
+          window.removeEventListener('touchend', stopDrag);
+        };
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', stopDrag);
+        window.addEventListener('touchmove', onTouchMove, { passive: false });
+        window.addEventListener('touchend', stopDrag);
+      };
+      dragBtn.onmousedown = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        startDrag(e.clientX, e.clientY);
+      };
+      dragBtn.ontouchstart = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.touches.length > 0) startDrag(e.touches[0].clientX, e.touches[0].clientY);
+      };
+      const dragLabel = new CSS2DObject(dragBtn);
+      dragLabel.position.set(0.22, heightCm / 100 + 0.22, 0);
+      rack.add(dragLabel);
     }
-  };
-
-  const stopDrag = () => {
-    controls.enabled = true;
-
-    window.removeEventListener('mousemove', onMouseMove);
-    window.removeEventListener('mouseup', stopDrag);
-
-    window.removeEventListener('touchmove', onTouchMove);
-    window.removeEventListener('touchend', stopDrag);
-  };
-
-  window.addEventListener('mousemove', onMouseMove);
-  window.addEventListener('mouseup', stopDrag);
-
-  window.addEventListener('touchmove', onTouchMove, { passive: false });
-  window.addEventListener('touchend', stopDrag);
-};
-
-dragBtn.onmousedown = (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-
-  startDrag(e.clientX, e.clientY);
-};
-
-dragBtn.ontouchstart = (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-
-  if (e.touches.length > 0) {
-    startDrag(
-      e.touches[0].clientX,
-      e.touches[0].clientY
-    );
-  }
-};
-
-
-    
-  const dragLabel = new CSS2DObject(dragBtn);
-  dragLabel.position.set(0.22, heightCm / 100 + 0.22, 0);
-  rack.add(dragLabel);
-}
         
-    // ========== Gondola 標準貨架模型 (黑色方管 + 鐵網 + 白色層板) ==========
+    // ========== Gondola 標準貨架模型 ==========
     function createGondolaRack(type, heightCm) {
       const group = new THREE.Group();
       const width = 0.90;
-const depth = type === 'single' ? 0.55 : 0.95;
+      const depth = type === 'single' ? 0.55 : 0.95;
       const height = heightCm / 100;
       
-      // 顏色配置 (依您指示修改)
-      const frameColor = 0xcc2222;   // 紅色柱子
-      const shelfColor = 0xf5f5f5;   // 白色層板
-      const meshColor = 0x666666;    // 鐵網灰色
+      const frameColor = 0xcc2222;
+      const shelfColor = 0xf5f5f5;
+      const meshColor = 0x666666;
       const baseColor = 0xf5f5f5;
       
-      // 1. 立柱 (黑色細方管)
       const pillarMat = new THREE.MeshStandardMaterial({ color: frameColor, metalness: 0.7, roughness: 0.35 });
-      const pillarGeo = new THREE.BoxGeometry(0.045, height, 0.045);  // 更細的方管
-     let pillarPos;
-
-if (type === 'single') {
-  pillarPos = [
-    [-width / 2 + 0.05, -height / 2, -depth / 2 + 0.03],
-    [ width / 2 - 0.05, -height / 2, -depth / 2 + 0.03]
-  ];
-} else {
-  // 雙面架只保留中間兩支立柱
-  pillarPos = [
-    [-width / 2 + 0.05, -height / 2, 0],
-    [ width / 2 - 0.05, -height / 2, 0]
-  ];
-}      pillarPos.forEach(pos => {
+      const pillarGeo = new THREE.BoxGeometry(0.045, height, 0.045);
+      let pillarPos;
+      if (type === 'single') {
+        pillarPos = [
+          [-width / 2 + 0.05, -height / 2, -depth / 2 + 0.03],
+          [ width / 2 - 0.05, -height / 2, -depth / 2 + 0.03]
+        ];
+      } else {
+        pillarPos = [
+          [-width / 2 + 0.05, -height / 2, 0],
+          [ width / 2 - 0.05, -height / 2, 0]
+        ];
+      }
+      pillarPos.forEach(pos => {
         const pillar = new THREE.Mesh(pillarGeo, pillarMat);
         pillar.position.set(pos[0], pos[1] + height/2, pos[2]);
         pillar.castShadow = true;
         group.add(pillar);
       });
       
-      // 2. 層板 (白色薄層板)
       const shelfMat = new THREE.MeshStandardMaterial({ color: shelfColor, roughness: 0.5, metalness: 0.05 });
-      const shelfThick = 0.02;  // 更薄的層板
+      const shelfThick = 0.02;
       let shelfCount = 2;
-
-if (heightCm >= 180) shelfCount = 4;
-else if (heightCm >= 150) shelfCount = 3;
-else shelfCount = 2;
+      if (heightCm >= 180) shelfCount = 4;
+      else if (heightCm >= 150) shelfCount = 3;
+      else shelfCount = 2;
       
       for (let i = 1; i <= shelfCount; i++) {
         const shelfY = -height/2 + (i * height / (shelfCount + 0.6));
-        
-        // 層板主體
         const shelfBoard = new THREE.Mesh(new THREE.BoxGeometry(width - 0.1, shelfThick, depth - 0.1), shelfMat);
         shelfBoard.position.set(0, shelfY, 0);
         shelfBoard.castShadow = true;
         shelfBoard.receiveShadow = true;
         group.add(shelfBoard);
         
-        // 層板前緣 (價格條位置)
         const frontMat = new THREE.MeshStandardMaterial({ color: 0xddddcc, metalness: 0.1 });
         const frontStrip = new THREE.Mesh(new THREE.BoxGeometry(width - 0.08, 0.015, 0.06), frontMat);
         frontStrip.position.set(0, shelfY + shelfThick/2 + 0.008, depth/2 - 0.04);
@@ -343,47 +307,28 @@ else shelfCount = 2;
         group.add(frontStrip);
       }
       
-      // 3. 鐵網背板 (Wire Mesh) - 取代原本的實心背板
       const meshMaterial = new THREE.LineBasicMaterial({ color: meshColor });
-      
       function createWireMesh(zPos) {
         const meshGroup = new THREE.Group();
         const startX = -0.42;
         const endX = 0.42;
         const startY = -height/2 + 0.1;
         const endY = height/2 - 0.1;
-        
-        // 垂直線
         for (let x = startX; x <= endX + 0.01; x += 0.085) {
-          const points = [
-            new THREE.Vector3(x, startY, zPos),
-            new THREE.Vector3(x, endY, zPos)
-          ];
+          const points = [new THREE.Vector3(x, startY, zPos), new THREE.Vector3(x, endY, zPos)];
           const geo = new THREE.BufferGeometry().setFromPoints(points);
           meshGroup.add(new THREE.Line(geo, meshMaterial));
         }
-        
-        // 水平線
         for (let y = startY; y <= endY + 0.01; y += 0.085) {
-          const points = [
-            new THREE.Vector3(startX, y, zPos),
-            new THREE.Vector3(endX, y, zPos)
-          ];
+          const points = [new THREE.Vector3(startX, y, zPos), new THREE.Vector3(endX, y, zPos)];
           const geo = new THREE.BufferGeometry().setFromPoints(points);
           meshGroup.add(new THREE.Line(geo, meshMaterial));
         }
-        
         group.add(meshGroup);
       }
+      if (type === 'single') createWireMesh(-depth/2 + 0.03);
+      else createWireMesh(0);
       
-      if (type === 'single') {
-        createWireMesh(-depth/2 + 0.03);
-      } else {
-        // 雙面架：中間隔板也是鐵網
-        createWireMesh(0);
-      }
-      
-      // 4. 底座 (黑色)
       const baseMat = new THREE.MeshStandardMaterial({ color: baseColor, roughness: 0.7 });
       const base = new THREE.Mesh(new THREE.BoxGeometry(width - 0.05, 0.06, depth - 0.05), baseMat);
       base.position.set(0, -height/2 + 0.03, 0);
@@ -391,33 +336,13 @@ else shelfCount = 2;
       base.receiveShadow = true;
       group.add(base);
       
-      // 5. 頂部蓋板 (黑色)
-      const topMat = new THREE.MeshStandardMaterial({
-  color: frameColor,
-  metalness: 0.7,
-  roughness: 0.35
-});
-
-// 前面橫桿
-      
-      // 6. 商品示意 (彩色商品盒)
-            
       return group;
     }
     
-    function addLabel(parent, text, yOffset) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      div.style.cssText = 'color:#ffca28;font-size:11px;font-weight:bold;background:rgba(0,0,0,0.65);padding:3px 8px;border-radius:16px;white-space:nowrap;border:1px solid #ffca2866;';
-      const label = new CSS2DObject(div);
-      label.position.set(0, yOffset, 0);
-      parent.add(label);
-    }
-    
-    // ========== 配件計算 (依您標準規格修正) ==========
+    // ========== 配件計算 ==========
     const specTable = {
       single120: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 6, Papan28: 3, Papan33: 1, baut: 4 },
-      single150: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 6, Papan28: 3, Papan33: 1, baut: 4 },  // 修正
+      single150: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 6, Papan28: 3, Papan33: 1, baut: 4 },
       single180: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 8, Papan28: 4, Papan33: 1, baut: 4 },
       single200: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 8, Papan28: 4, Papan33: 1, baut: 4 },
       double120: { kakiStart: 2, kakiJoin: 1, mesh: 1, tatakan: 12, Papan28: 6, Papan33: 2, baut: 4 },
@@ -427,32 +352,32 @@ else shelfCount = 2;
     };
     
     function getSpec(type, height, isStarting) {
-  const key = (type === 'single' ? 'single' : 'double') + height;
-  const spec = specTable[key];
-  return {
-    kaki: isStarting ? spec.kakiStart : spec.kakiJoin,
-    mesh: spec.mesh,
-    tatakan: spec.tatakan,
-    Papan28: spec.Papan28,
-    Papan33: spec.Papan33,
-    baut: spec.baut
-  };
-}
+      const key = (type === 'single' ? 'single' : 'double') + height;
+      const spec = specTable[key];
+      return {
+        kaki: isStarting ? spec.kakiStart : spec.kakiJoin,
+        mesh: spec.mesh,
+        tatakan: spec.tatakan,
+        Papan28: spec.Papan28,
+        Papan33: spec.Papan33,
+        baut: spec.baut
+      };
+    }
     
     function calculateOneRack(type, isStarting, height, qty) {
       if (qty <= 0) return null;
       const spec = getSpec(type, height, isStarting);
       return {
-  typeLabel: `${type === 'single' ? 'single' : 'Double'} ${isStarting ? 'Starting' : 'Join'}`,
-  height,
-  qty,
-  kaki: spec.kaki * qty,
-  mesh: spec.mesh * qty,
-  tatakan: spec.tatakan * qty,
-  Papan28: spec.Papan28 * qty,
-  Papan33: spec.Papan33 * qty,
-  baut: spec.baut * qty
-};
+        typeLabel: `${type === 'single' ? 'Single' : 'Double'} ${isStarting ? 'Starting' : 'Join'}`,
+        height,
+        qty,
+        kaki: spec.kaki * qty,
+        mesh: spec.mesh * qty,
+        tatakan: spec.tatakan * qty,
+        Papan28: spec.Papan28 * qty,
+        Papan33: spec.Papan33 * qty,
+        baut: spec.baut * qty
+      };
     }
     
     function getAllRackData() {
@@ -464,7 +389,7 @@ else shelfCount = 2;
         const height = parseInt(document.getElementById(`${t.id}Height`).value);
         const res = calculateOneRack(t.type, t.isStarting, height, qty);
         if (res) results.push(res);
-        else results.push({ typeLabel: `${t.type==='single'?'single':'Double'} ${t.isStarting?'Starting':'Join'}`, height, qty:0, kaki:0, mesh:0, tatakan:0, shelf28:0, shelf33:0, baut:0 });
+        else results.push({ typeLabel: `${t.type==='single'?'Single':'Double'} ${t.isStarting?'Starting':'Join'}`, height, qty:0, kaki:0, mesh:0, tatakan:0, Papan28:0, Papan33:0, baut:0 });
       }
       return results;
     }
@@ -482,22 +407,22 @@ else shelfCount = 2;
         row.insertCell(4).innerText = d.mesh;
         row.insertCell(5).innerText = d.tatakan;
         row.insertCell(6).innerText = d.Papan28;
-      row.insertCell(7).innerText = d.Papan33;
+        row.insertCell(7).innerText = d.Papan33;
         row.insertCell(8).innerText = d.baut;
         total.qty += d.qty; total.kaki += d.kaki; total.mesh += d.mesh; total.tatakan += d.tatakan;
         total.Papan28 += d.Papan28;
-total.Papan33 += d.Papan33; total.baut += d.baut;
+        total.Papan33 += d.Papan33; total.baut += d.baut;
       }
       const tr = tbody.insertRow();
       tr.className = 'total-row';
-      tr.insertCell(0).innerText = '📌 總計';
+      tr.insertCell(0).innerText = '📌 Total';
       tr.insertCell(1).innerText = '—';
       tr.insertCell(2).innerText = total.qty;
       tr.insertCell(3).innerText = total.kaki;
       tr.insertCell(4).innerText = total.mesh;
       tr.insertCell(5).innerText = total.tatakan;
       tr.insertCell(6).innerText = total.Papan28;
-tr.insertCell(7).innerText = total.Papan33;
+      tr.insertCell(7).innerText = total.Papan33;
       tr.insertCell(8).innerText = total.baut;
     }
     
@@ -505,15 +430,14 @@ tr.insertCell(7).innerText = total.Papan33;
     
     function update3DRacks() {
       if (currentGroup) {
-  scene.remove(currentGroup);
-  currentGroup.traverse(obj => {
-    if (obj.element && obj.element.parentNode) {
-      obj.element.parentNode.removeChild(obj.element);
-    }
-  });
-}
-
-draggableRacks = [];
+        scene.remove(currentGroup);
+        currentGroup.traverse(obj => {
+          if (obj.element && obj.element.parentNode) {
+            obj.element.parentNode.removeChild(obj.element);
+          }
+        });
+      }
+      draggableRacks = [];
       
       const lengthM = parseFloat(document.getElementById('length').value) || 10;
       const widthM = parseFloat(document.getElementById('width').value) || 7;
@@ -521,7 +445,6 @@ draggableRacks = [];
       const sj = parseInt(document.getElementById('sjQty').value) || 0;
       const ds = parseInt(document.getElementById('dsQty').value) || 0;
       const dj = parseInt(document.getElementById('djQty').value) || 0;
-      const totalSingle = ss + sj, totalDouble = ds + dj;
       
       let sH = 150, dH = 150;
       if (ss > 0) sH = parseInt(document.getElementById('ssHeight').value);
@@ -531,133 +454,250 @@ draggableRacks = [];
       
       const group = new THREE.Group();
       const rackLen = 0.90;
-const joinOffset = 0.86; // Join 自動貼齊，沒有空隙
+      const joinOffset = 0.86;
       const startX = -lengthM/2 + 0.6;
-      const maxX = lengthM/2 - 0.6;
       
-      // 雙面架（中央）
-      const doubleRowSpacing = 1.4;
-const doubleRows = [];
+            // 70cm 走道，Single 永遠在最前面與最後面，Double 在中間
+      const walkway = 0.70;
 
-// 依照 Double Starting 數量建立幾列
-for (let i = 0; i < ds; i++) {
-  doubleRows.push({
-    x: startX,
-    z: -0.3 + (i * doubleRowSpacing)
-  });
-}
+      const singleFrontZ = -widthM / 2 + 0.275;
+      const singleBackZ = widthM / 2 - 0.275;
 
-// 每列先放一個 Double Starting
-doubleRows.forEach((row) => {
-  const rack = createGondolaRack('double', dH);
+      const middleTop = singleFrontZ + 0.55 + walkway;
+      const middleBottom = singleBackZ - 0.55 - walkway;
 
-  rack.position.set(row.x, 0, row.z);
+      const doubleRowSpacing = 0.95 + walkway;
 
-  addRotateHandle(rack, dH);
+      const doubleRows = [];
+      let currentDoubleZ = middleTop;
 
-  group.add(rack);
-  draggableRacks.push(rack);
+      // 原本的 Double Starting
+      for (let i = 0; i < ds; i++) {
+        if (currentDoubleZ > middleBottom) break;
 
-  row.x += rackLen;
-});
+        doubleRows.push({
+          x: startX,
+          z: currentDoubleZ
+        });
 
-// Double Join 自動平均接到每一列後面
-for (let i = 0; i < dj; i++) {
-  if (doubleRows.length === 0) break;
+        currentDoubleZ += doubleRowSpacing;
+      }
 
-  const row = doubleRows[i % doubleRows.length];
-  const rack = createGondolaRack('double', dH);
+      // 多出來的 Single Starting，不增加新的 Double 排，
+      // 而是補到現有 Double 排上面
+      const extraSingle = Math.max(0, ss - 2);
 
-  row.x -= (rackLen - joinOffset);
+      for (let i = 0; i < extraSingle; i++) {
+        if (doubleRows.length === 0) {
+          if (currentDoubleZ > middleBottom) break;
 
-  rack.position.set(row.x, 0, row.z);
+          doubleRows.push({
+            x: startX,
+            z: currentDoubleZ
+          });
 
-  addRotateHandle(rack, dH);
+          currentDoubleZ += doubleRowSpacing;
+        } else {
+          doubleRows[i % doubleRows.length].x += rackLen;
+        }
+      }   
 
-  group.add(rack);
-  draggableRacks.push(rack);
-
-  row.x += joinOffset;
-}
+   doubleRows.forEach((row) => {
+        const rack = createGondolaRack('double', dH);
+        rack.position.set(row.x, 0, row.z);
+        addRotateHandle(rack, dH);
+        group.add(rack);
+        draggableRacks.push(rack);
+        row.x += rackLen;
+      });
+      for (let i = 0; i < dj; i++) {
+        if (doubleRows.length === 0) break;
+        const row = doubleRows[i % doubleRows.length];
+        const rack = createGondolaRack('double', dH);
+        row.x -= (rackLen - joinOffset);
+        rack.position.set(row.x, 0, row.z);
+        addRotateHandle(rack, dH);
+        group.add(rack);
+        draggableRacks.push(rack);
+        row.x += joinOffset;
+      }
       
-      // Single（左右牆）
-      const leftZ = -widthM/2 + 0.45;
-      const rightZ = widthM/2 - 0.45;
-      const rowSpacing = 1.2;
-const rows = [];
+            // Single 永遠在前後兩邊
+      const rowSpacing = 0.55 + walkway;
+      const rows = [];
 
-// 依照 Starting 數量建立幾列
-for (let i = 0; i < ss; i++) {
-  rows.push({
-    x: startX,
-    z: leftZ + (i * rowSpacing)
-  });
-}
+      if (ss >= 1) {
+        rows.push({
+          x: startX,
+          z: singleFrontZ
+        });
+      }
 
-// 每列先放一個 Starting
-rows.forEach((row) => {
-  const rack = createGondolaRack('single', sH);
+      if (ss >= 2) {
+        rows.push({
+          x: startX,
+          z: singleBackZ
+        });
+      }
 
-  rack.position.set(row.x, 0, row.z);
+  rows.forEach((row, index) => {
+        const rack = createGondolaRack('single', sH);
+        rack.position.set(row.x, 0, row.z);
 
-  addRotateHandle(rack, sH);
+        // 前面那排要朝店內
+        if (index === 0) {
+          rack.rotation.y = 0;
+        }
 
-  group.add(rack);
-  draggableRacks.push(rack);
+        // 後面那排要朝店內
+        if (index === 1) {
+          rack.rotation.y = Math.PI;
+        }
 
-  row.x += rackLen;
-});
+        addRotateHandle(rack, sH);
+        group.add(rack);
+        draggableRacks.push(rack);
 
-// Join 自動平均分到每一列後面
-for (let i = 0; i < sj; i++) {
-  if (rows.length === 0) break;
+        row.x += rackLen;
+      });
+      for (let i = 0; i < sj; i++) {
+        if (rows.length === 0) break;
 
-  const row = rows[i % rows.length];
-  const rack = createGondolaRack('single', sH);
+        const rowIndex = i % rows.length;
+        const row = rows[rowIndex];
 
-  row.x -= (rackLen - joinOffset);
+        const rack = createGondolaRack('single', sH);
 
-  rack.position.set(row.x, 0, row.z);
+        row.x -= (rackLen - joinOffset);
+        rack.position.set(row.x, 0, row.z);
 
-  addRotateHandle(rack, sH);
+        // Join 跟著該排 Starting 的方向
+        if (rowIndex === 0) {
+          rack.rotation.y = 0;
+        }
 
-  group.add(rack);
-  draggableRacks.push(rack);
+        if (rowIndex === 1) {
+          rack.rotation.y = Math.PI;
+        }
+        addRotateHandle(rack, sH);
+        group.add(rack);
+        draggableRacks.push(rack);
 
-  row.x += joinOffset;
-}
-      // 店面邊框
+        row.x += joinOffset;
+      }      
       const floorY = -0.92;
-
-const borderPts = [
-  new THREE.Vector3(-lengthM/2, floorY, -widthM/2),
-  new THREE.Vector3(lengthM/2, floorY, -widthM/2),
-  new THREE.Vector3(lengthM/2, floorY, widthM/2),
-  new THREE.Vector3(-lengthM/2, floorY, widthM/2),
-  new THREE.Vector3(-lengthM/2, floorY, -widthM/2)
-];
+      const borderPts = [
+        new THREE.Vector3(-lengthM/2, floorY, -widthM/2),
+        new THREE.Vector3(lengthM/2, floorY, -widthM/2),
+        new THREE.Vector3(lengthM/2, floorY, widthM/2),
+        new THREE.Vector3(-lengthM/2, floorY, widthM/2),
+        new THREE.Vector3(-lengthM/2, floorY, -widthM/2)
+      ];
       const borderGeo = new THREE.BufferGeometry().setFromPoints(borderPts);
       const borderMat = new THREE.LineBasicMaterial({ color: 0xffaa66 });
       const borderLine = new THREE.Line(borderGeo, borderMat);
       group.add(borderLine);
       
       currentGroup = group;
-
-if (dragControls) {
-  dragControls.deactivate();
-  dragControls.dispose();
-}
-
-dragControls = new DragControls([], camera, renderer.domElement);
-dragControls.recursive = false;
-dragControls.transformGroup = false;
-scene.add(currentGroup);
+      if (dragControls) {
+        dragControls.deactivate();
+        dragControls.dispose();
+      }
+      dragControls = new DragControls([], camera, renderer.domElement);
+      dragControls.recursive = false;
+      dragControls.transformGroup = false;
+      scene.add(currentGroup);
     }
     
     function updateAll() {
       const data = getAllRackData();
       renderTable(data);
       update3DRacks();
+    }
+    
+    // ========== 智能自動配置 (可一直按，每次隨機生成不同組合) ==========
+    function autoGenerateLayout() {
+      const panjang = parseFloat(document.getElementById('length').value) || 10;
+      const lebar = parseFloat(document.getElementById('width').value) || 7;
+      
+      // 根據長寬計算最大可擺放數量 (預留邊距)
+      const rackLength = 0.90;
+const sideMargin = 1.2;
+
+const maxSinglePerRow = Math.max(
+  0,
+  Math.floor((panjang - sideMargin) / rackLength)
+);
+
+const maxDoublePerRow = Math.max(
+  0,
+  Math.floor((panjang - sideMargin) / rackLength)
+);
+      
+      // 隨機決定高度 (偏向150/180較常見)
+      const heightOptions = [120, 150, 180, 200];
+      const randHeight = () => heightOptions[Math.floor(Math.random() * heightOptions.length)];
+      
+      // 隨機產生單面架數量 (Starting + Join)
+      let singleStartQty = 0;
+      let singleJoinQty = 0;
+      let doubleStartQty = 0;
+      let doubleJoinQty = 0;
+      
+      // 計算最多可以有幾排
+      const walkway = 0.70;
+
+      // 最少保留前後兩排 Single
+      const maxSingleRows = Math.max(
+        2,
+        Math.floor(lebar / (0.55 + walkway))
+      );
+
+      // Double 只能放在中間，扣掉前後 Single 與走道
+      const usableMiddle =
+        lebar
+        - (0.55 * 2)
+        - (walkway * 2);
+
+      const maxDoubleRows = Math.max(
+        0,
+        Math.floor(usableMiddle / (0.95 + walkway))
+      );      // 單面架
+      const singleRowCount = Math.floor(Math.random() * maxSingleRows) + 1;
+      singleStartQty = singleRowCount;
+
+      let maxSingleJoin = singleRowCount * (maxSinglePerRow - 1);
+      maxSingleJoin = Math.max(0, maxSingleJoin);
+
+      singleJoinQty = Math.floor(Math.random() * (maxSingleJoin + 1));
+
+      // 雙面架
+      const doubleRowCount =
+        maxDoubleRows > 0
+          ? Math.floor(Math.random() * (maxDoubleRows + 1))
+          : 0;
+
+      doubleStartQty = doubleRowCount;
+      let maxDoubleJoin = doubleRowCount * (maxDoublePerRow - 1);
+      maxDoubleJoin = Math.max(0, maxDoubleJoin);
+
+      doubleJoinQty = Math.floor(Math.random() * (maxDoubleJoin + 1));      
+      // 隨機選擇高度 (讓每個貨架類型可能不同，但為了簡化，讓同類型同高度)
+      const singleHeight = randHeight();
+      const doubleHeight = randHeight();
+      
+      // 寫入表單
+      document.getElementById('ssQty').value = singleStartQty;
+      document.getElementById('sjQty').value = singleJoinQty;
+      document.getElementById('dsQty').value = doubleStartQty;
+      document.getElementById('djQty').value = doubleJoinQty;
+      document.getElementById('ssHeight').value = singleHeight;
+      document.getElementById('sjHeight').value = singleHeight;
+      document.getElementById('dsHeight').value = doubleHeight;
+      document.getElementById('djHeight').value = doubleHeight;
+      
+      // 觸發更新
+      updateAll();
     }
     
     function animate() {
@@ -676,82 +716,71 @@ scene.add(currentGroup);
       labelRenderer.setSize(w, h);
     });
 
-   function shareToWhatsApp() {
-  const rows = getAllRackData();
-
-  let total = {
-  kakiSingle120: 0,
-  kakiSingle150: 0,
-  kakiSingle180: 0,
-  kakiSingle200: 0,
-
-  kakiDouble120: 0,
-  kakiDouble150: 0,
-  kakiDouble180: 0,
-  kakiDouble200: 0,
-
-  mesh: 0,
-  tatakan: 0,
-  Papan28: 0,
-  Papan33: 0,
-  baut: 0
-};
-
-
-  let message = '📦 Daftar Aksesoris Gondola\n\n';
-
-  rows.forEach(r => {
-    if (r.qty > 0) {
-      message += `${r.typeLabel} ${r.height}cm x ${r.qty}\n`;
-      message += `Kaki: ${r.kaki}\n`;
-      message += `Wire Mesh: ${r.mesh}\n`;
-      message += `Tatakan: ${r.tatakan}\n`;
-      message += `Papan 28cm: ${r.Papan28}\n`;
-      message += `Papan 33cm: ${r.Papan33}\n`;
-      message += `Baut: ${r.baut}\n\n`;
-
-      if (r.typeLabel.toLowerCase().includes('single')) {
-  if (r.height === 120) total.kakiSingle120 += r.kaki;
-  if (r.height === 150) total.kakiSingle150 += r.kaki;
-  if (r.height === 180) total.kakiSingle180 += r.kaki;
-  if (r.height === 200) total.kakiSingle200 += r.kaki;
-} else {
-  if (r.height === 120) total.kakiDouble120 += r.kaki;
-  if (r.height === 150) total.kakiDouble150 += r.kaki;
-  if (r.height === 180) total.kakiDouble180 += r.kaki;
-  if (r.height === 200) total.kakiDouble200 += r.kaki;
-}
-
-total.mesh += r.mesh;
-total.tatakan += r.tatakan;
-total.Papan28 += r.Papan28;
-total.Papan33 += r.Papan33;
-total.baut += r.baut;
+    function shareToWhatsApp() {
+      const rows = getAllRackData();
+      let total = {
+        kakiSingle120: 0, kakiSingle150: 0, kakiSingle180: 0, kakiSingle200: 0,
+        kakiDouble120: 0, kakiDouble150: 0, kakiDouble180: 0, kakiDouble200: 0,
+        mesh: 0, tatakan: 0, Papan28: 0, Papan33: 0, baut: 0
+      };
+      let message = '📦 Daftar Aksesoris Gondola\n\n';
+      rows.forEach(r => {
+        if (r.qty > 0) {
+          message += `${r.typeLabel} ${r.height}cm x ${r.qty}\n`;
+          message += `Kaki: ${r.kaki}\n`;
+          message += `Wire Mesh: ${r.mesh}\n`;
+          message += `Tatakan: ${r.tatakan}\n`;
+          message += `Papan 28cm: ${r.Papan28}\n`;
+          message += `Papan 33cm: ${r.Papan33}\n`;
+          message += `Baut: ${r.baut}\n\n`;
+          if (r.typeLabel.toLowerCase().includes('single')) {
+            if (r.height === 120) total.kakiSingle120 += r.kaki;
+            if (r.height === 150) total.kakiSingle150 += r.kaki;
+            if (r.height === 180) total.kakiSingle180 += r.kaki;
+            if (r.height === 200) total.kakiSingle200 += r.kaki;
+          } else {
+            if (r.height === 120) total.kakiDouble120 += r.kaki;
+            if (r.height === 150) total.kakiDouble150 += r.kaki;
+            if (r.height === 180) total.kakiDouble180 += r.kaki;
+            if (r.height === 200) total.kakiDouble200 += r.kaki;
+          }
+          total.mesh += r.mesh;
+          total.tatakan += r.tatakan;
+          total.Papan28 += r.Papan28;
+          total.Papan33 += r.Papan33;
+          total.baut += r.baut;
+        }
+      });
+      message += '📌 Total Keseluruhan\n';
+      if (total.kakiSingle120 > 0) message += `Kaki Single 120cm : ${total.kakiSingle120}\n`;
+      if (total.kakiSingle150 > 0) message += `Kaki Single 150cm : ${total.kakiSingle150}\n`;
+      if (total.kakiSingle180 > 0) message += `Kaki Single 180cm : ${total.kakiSingle180}\n`;
+      if (total.kakiSingle200 > 0) message += `Kaki Single 200cm : ${total.kakiSingle200}\n`;
+      if (total.kakiDouble120 > 0) message += `Kaki Double 120cm : ${total.kakiDouble120}\n`;
+      if (total.kakiDouble150 > 0) message += `Kaki Double 150cm : ${total.kakiDouble150}\n`;
+      if (total.kakiDouble180 > 0) message += `Kaki Double 180cm : ${total.kakiDouble180}\n`;
+      if (total.kakiDouble200 > 0) message += `Kaki Double 200cm : ${total.kakiDouble200}\n`;
+      if (total.mesh > 0) message += `Wire Mesh : ${total.mesh}\n`;
+      if (total.tatakan > 0) message += `Tatakan : ${total.tatakan}\n`;
+      if (total.Papan28 > 0) message += `Papan 28cm : ${total.Papan28}\n`;
+      if (total.Papan33 > 0) message += `Papan 33cm : ${total.Papan33}\n`;
+      if (total.baut > 0) message += `Baut : ${total.baut}\n`;
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      window.open(waUrl, '_blank');
     }
-  });
+    
+   function contactOwnerWhatsApp() {
+  const message = `Halo, saya melihat website Pekanbaru Display dan ingin bertanya tentang rak gondola. Saya menghubungi dari website konfigurasi gondola.`;
 
-  message += '📌 Total Keseluruhan\n';
-if (total.kakiSingle120 > 0) message += `Kaki Single 120cm : ${total.kakiSingle120}\n`;
-if (total.kakiSingle150 > 0) message += `Kaki Single 150cm : ${total.kakiSingle150}\n`;
-if (total.kakiSingle180 > 0) message += `Kaki Single 180cm : ${total.kakiSingle180}\n`;
-if (total.kakiSingle200 > 0) message += `Kaki Single 200cm : ${total.kakiSingle200}\n`;
+  const waUrl = `https://wa.me/6281291140243?text=${encodeURIComponent(message)}`;
 
-if (total.kakiDouble120 > 0) message += `Kaki Double 120cm : ${total.kakiDouble120}\n`;
-if (total.kakiDouble150 > 0) message += `Kaki Double 150cm : ${total.kakiDouble150}\n`;
-if (total.kakiDouble180 > 0) message += `Kaki Double 180cm : ${total.kakiDouble180}\n`;
-if (total.kakiDouble200 > 0) message += `Kaki Double 200cm : ${total.kakiDouble200}\n`;
-
-if (total.mesh > 0) message += `Wire Mesh : ${total.mesh}\n`;
-if (total.tatakan > 0) message += `Tatakan : ${total.tatakan}\n`;
-if (total.Papan28 > 0) message += `Papan 28cm : ${total.Papan28}\n`;
-if (total.Papan33 > 0) message += `Papan 33cm : ${total.Papan33}\n`;
-if (total.baut > 0) message += `Baut : ${total.baut}\n`;
-  const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(waUrl, '_blank');
 }
-    
-    window.updateAll = updateAll;
+
+window.updateAll = updateAll;
 window.shareToWhatsApp = shareToWhatsApp;
+window.contactOwnerWhatsApp = contactOwnerWhatsApp;
+window.autoGenerateLayout = autoGenerateLayout;
 setTimeout(updateAll, 200);
   </script>
 </body>
