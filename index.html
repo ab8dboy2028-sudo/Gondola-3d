@@ -5,43 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Pekanbaru Display · Rak Gondola 3D + Auto Layout</title>
   <style>
-    /* ========== 全新布局样式 (根据要求完全替换) ========== */
+    /* ========== 全新滚动布局 (表单在上, 3D在下) ========== */
     body {
       margin: 0;
       font-family: 'Segoe UI', Arial, sans-serif;
       background: #e2e8f0;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
     .main-layout {
-      display: flex;
-      width: 100vw;
-      height: 100vh;
+      display: block;
+      width: 100%;
     }
 
     .left-panel {
-      width: 400px;
-      min-width: 400px;
-      height: 100vh;
+      width: 100%;
+      min-width: 100%;
       padding: 20px;
-      overflow-y: auto;
       background: #f1f5f9;
-      border-right: 1px solid #cbd5e1;
-    }
-
-    .left-panel::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .left-panel::-webkit-scrollbar-thumb {
-      background: #94a3b8;
-      border-radius: 10px;
     }
 
     .right-panel {
       position: relative;
-      flex: 1;
+      width: 100%;
       height: 100vh;
+      margin-top: 20px;
       background: #0a0a1a;
     }
 
@@ -53,7 +42,8 @@
     .control-panel {
       position: static;
       width: 100%;
-      max-height: none;
+      max-width: 1200px;
+      margin: 0 auto;
       background: rgba(30, 30, 45, 0.95);
       backdrop-filter: blur(12px);
       border-radius: 24px;
@@ -88,16 +78,17 @@
       font-size: 11px;
       color: white;
       z-index: 10;
+      pointer-events: none;
     }
     
     /* 原有组件样式 (未修改逻辑, 仅保留视觉相关) */
     h1 { font-size: 24px; color: #ffca28; margin-bottom: 5px; }
     .sub { color: #bbb; margin-bottom: 16px; border-left: 3px solid #ff9800; padding-left: 10px; font-size: 11px; }
-    .input-row { display: flex; gap: 12px; margin-bottom: 16px; }
-    .input-group { flex: 1; }
+    .input-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .input-group { flex: 1; min-width: 120px; }
     .input-group label { font-size: 11px; color: #ffca28; display: block; margin-bottom: 4px; }
     input, select, button { width: 100%; padding: 8px 10px; border: none; border-radius: 12px; font-size: 13px; background: #3a3a3a; color: white; }
-    button { background: #ff9800; color: #1e1e1e; font-weight: bold; cursor: pointer; }
+    button { background: #ff9800; color: #1e1e1e; font-weight: bold; cursor: pointer; transition: 0.2s; }
     button:hover { background: #f57c00; }
     
     .config-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 16px 0; }
@@ -124,37 +115,43 @@
     .btn-calc { background: #ff9800; padding: 10px; font-size: 14px; margin: 8px 0; }
     .btn-auto { background: #2196f3; padding: 10px; font-size: 14px; margin: 8px 0; }
     
-    /* 响应式布局: 完全按照用户提供的媒体查询 */
+    /* 响应式布局: 完全按照用户最终提供的媒体查询 */
     @media (max-width: 900px) {
-      .main-layout {
-        flex-direction: column;
-      }
-
       .left-panel {
-        width: 100%;
-        min-width: 100%;
-        height: auto;
-        max-height: 45vh;
         padding: 12px;
       }
 
       .right-panel {
-        width: 100%;
-        height: 55vh;
+        height: 70vh;
+        margin-top: 12px;
       }
 
       .control-panel {
         padding: 14px;
       }
 
+      .input-row,
       .config-grid {
         grid-template-columns: 1fr;
+        display: grid;
+      }
+      
+      .input-row {
+        display: grid;
+        gap: 10px;
+      }
+    }
+    
+    /* 保持桌面大屏幕时 .config-grid 双栏美观 */
+    @media (min-width: 901px) {
+      .config-grid {
+        grid-template-columns: repeat(2, 1fr);
       }
     }
   </style>
 </head>
 <body>
-  <!-- 新的布局结构: left-panel + right-panel -->
+  <!-- 垂直布局: 先左面板(表单与表格), 再右面板(3D场景) -->
   <div class="main-layout">
     <div class="left-panel">
       <div class="control-panel">
