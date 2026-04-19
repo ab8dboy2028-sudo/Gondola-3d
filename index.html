@@ -5,21 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Pekanbaru Display · Rak Gondola 3D + Auto Layout</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a1a; overflow: hidden; }
-    #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-    
-    .control-panel {
-      position: fixed; top: 20px; right: 20px; width: 380px;
-      max-height: calc(100vh - 40px); background: rgba(30, 30, 45, 0.95);
-      backdrop-filter: blur(12px); border-radius: 24px; padding: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,202,40,0.3);
-      z-index: 10; overflow-y: auto; font-size: 13px;
+    /* ========== 全新布局样式 (根据要求完全替换) ========== */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #e2e8f0;
+      overflow: hidden;
     }
-    .control-panel::-webkit-scrollbar { width: 6px; }
-    .control-panel::-webkit-scrollbar-track { background: #2d2d2d; border-radius: 10px; }
-    .control-panel::-webkit-scrollbar-thumb { background: #ffca28; border-radius: 10px; }
+
+    .main-layout {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .left-panel {
+      width: 400px;
+      min-width: 400px;
+      height: 100vh;
+      padding: 20px;
+      overflow-y: auto;
+      background: #f1f5f9;
+      border-right: 1px solid #cbd5e1;
+    }
+
+    .left-panel::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .left-panel::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 10px;
+    }
+
+    .right-panel {
+      position: relative;
+      flex: 1;
+      height: 100vh;
+      background: #0a0a1a;
+    }
+
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+    }
+
+    .control-panel {
+      position: static;
+      width: 100%;
+      max-height: none;
+      background: rgba(30, 30, 45, 0.95);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,202,40,0.3);
+      overflow-y: visible;
+      font-size: 13px;
+    }
+
+    .control-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .control-panel::-webkit-scrollbar-track {
+      background: #2d2d2d;
+      border-radius: 10px;
+    }
+
+    .control-panel::-webkit-scrollbar-thumb {
+      background: #ffca28;
+      border-radius: 10px;
+    }
+
+    .info-3d {
+      position: absolute;
+      bottom: 15px;
+      left: 15px;
+      background: rgba(0,0,0,0.6);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: white;
+      z-index: 10;
+    }
     
+    /* 原有组件样式 (未修改逻辑, 仅保留视觉相关) */
     h1 { font-size: 24px; color: #ffca28; margin-bottom: 5px; }
     .sub { color: #bbb; margin-bottom: 16px; border-left: 3px solid #ff9800; padding-left: 10px; font-size: 11px; }
     .input-row { display: flex; gap: 12px; margin-bottom: 16px; }
@@ -52,65 +123,94 @@
     .note-info { background: #ffca2811; padding: 8px; border-radius: 12px; margin-top: 12px; font-size: 10px; color: #ffca28; text-align: center; }
     .btn-calc { background: #ff9800; padding: 10px; font-size: 14px; margin: 8px 0; }
     .btn-auto { background: #2196f3; padding: 10px; font-size: 14px; margin: 8px 0; }
-    .info-3d { position: fixed; bottom: 15px; left: 15px; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 20px; font-size: 11px; z-index: 10; }
     
-    @media (max-width: 700px) { .control-panel { width: 340px; right: 10px; top: 10px; padding: 12px; } .config-grid { grid-template-columns: 1fr; } }
+    /* 响应式布局: 完全按照用户提供的媒体查询 */
+    @media (max-width: 900px) {
+      .main-layout {
+        flex-direction: column;
+      }
+
+      .left-panel {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        max-height: 45vh;
+        padding: 12px;
+      }
+
+      .right-panel {
+        width: 100%;
+        height: 55vh;
+      }
+
+      .control-panel {
+        padding: 14px;
+      }
+
+      .config-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
-  <div id="canvas-container"></div>
-  
-  <div class="control-panel">
-    <h1>🏪 Pekanbaru Display</h1>
-    <div class="sub">Rak Gondola Minimarket 3D | Sistem Konfigurasi Rak</div>
-    
-    <div class="input-row">
-      <div class="input-group"><label>📏 Panjang (m)</label><input id="length" type="number" step="0.5" value="10.0"></div>
-      <div class="input-group"><label>📐 Lebar (m)</label><input id="width" type="number" step="0.5" value="7.0"></div>
+  <!-- 新的布局结构: left-panel + right-panel -->
+  <div class="main-layout">
+    <div class="left-panel">
+      <div class="control-panel">
+        <h1>🏪 Pekanbaru Display</h1>
+        <div class="sub">Rak Gondola Minimarket 3D | Sistem Konfigurasi Rak</div>
+        
+        <div class="input-row">
+          <div class="input-group"><label>📏 Panjang (m)</label><input id="length" type="number" step="0.5" value="10.0"></div>
+          <div class="input-group"><label>📐 Lebar (m)</label><input id="width" type="number" step="0.5" value="7.0"></div>
+        </div>
+        
+        <div class="config-grid">
+          <div class="rack-card"><h4>🧱 Single Starting <span class="badge">Kaki x2</span></h4>
+            <input id="ssQty" type="number" min="0" value="0" step="1"><select id="ssHeight"><option value="120">120cm</option><option value="150" selected>150cm</option><option value="180">180cm</option><option value="200">200cm</option></select>
+          </div>
+          <div class="rack-card"><h4>🧱 Single Join <span class="badge">Kaki x1</span></h4>
+            <input id="sjQty" type="number" min="0" value="0" step="1"><select id="sjHeight"><option value="120">120cm</option><option value="150" selected>150cm</option><option value="180">180cm</option><option value="200">200cm</option></select>
+          </div>
+          <div class="rack-card"><h4>🔁 Double Starting <span class="badge">Kaki x2</span></h4>
+            <input id="dsQty" type="number" min="0" value="0" step="1"><select id="dsHeight"><option value="120">120cm</option><option value="150" selected>150cm</option><option value="180">180cm</option><option value="200">200cm</option></select>
+          </div>
+          <div class="rack-card"><h4>🔁 Double Join <span class="badge">Kaki x1</span></h4>
+            <input id="djQty" type="number" min="0" value="0" step="1"><select id="djHeight"><option value="120">120cm</option><option value="150" selected>150cm</option><option value="180">180cm</option><option value="200">200cm</option></select>
+          </div>
+        </div>
+        
+        <button class="btn-auto" onclick="autoGenerateLayout()">🤖 Auto Konfigurasi (Coba Lagi)</button>
+        <button class="btn-calc" onclick="updateAll()">✨ Perbarui Rak Gondola & Hitung Aksesoris</button>
+        <button style="background:#25D366;color:white;padding:10px;border-radius:12px;margin-bottom:12px;"
+                onclick="shareToWhatsApp()">
+          💬 Bagikan ke WhatsApp
+        </button>
+        <button style="background:#128C7E;color:white;padding:10px;border-radius:12px;margin-bottom:12px;"
+                onclick="contactOwnerWhatsApp()">
+          📲 Hubungi Saya Langsung
+        </button>
+        
+        <div class="result-table">
+          <table id="accessoryTable">
+            <thead>
+              <tr><th>Jenis</th><th>Tinggi</th><th>Jumlah</th><th>Kaki</th><th>wireMesh</th><th>Tatakan</th><th>Papan28</th><th>Papan33</th><th>Baut</th></tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr><td colspan="9">Klik tombol untuk menghitung</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note-info">🛒 Rak Gondola Standar | Pipa hitam + Back panel kawat + Rak putih | Seret mouse untuk memutar | Klik kanan untuk geser | Scroll zoom</div>
+      </div>
     </div>
     
-    <div class="config-grid">
-      <div class="rack-card"><h4>🧱 Single Starting <span class="badge">Kaki x2</span></h4>
-        <input id="ssQty" type="number" min="0" value="0" step="1"><select id="ssHeight"><option value="120">120cm</option><option value="150" selected>150cm</option><option value="180">180cm</option><option value="200">200cm</option></select>
-      </div>
-      <div class="rack-card"><h4>🧱 Single Join <span class="badge">Kaki x1</span></h4>
-        <input id="sjQty" type="number" min="0" value="0" step="1"><select id="sjHeight"><option value="120">120cm</option><option value="150" selected>150cm</option><option value="180">180cm</option><option value="200">200cm</option></select>
-      </div>
-      <div class="rack-card"><h4>🔁 Double Starting <span class="badge">Kaki x2</span></h4>
-        <input id="dsQty" type="number" min="0" value="0" step="1"><select id="dsHeight"><option value="120">120cm</option><option value="150" selected>150cm</option><option value="180">180cm</option><option value="200">200cm</option></select>
-      </div>
-      <div class="rack-card"><h4>🔁 Double Join <span class="badge">Kaki x1</span></h4>
-        <input id="djQty" type="number" min="0" value="0" step="1"><select id="djHeight"><option value="120">120cm</option><option value="150" selected>150cm</option><option value="180">180cm</option><option value="200">200cm</option></select>
-      </div>
+    <div class="right-panel">
+      <div id="canvas-container"></div>
+      <div class="info-3d">🖱️ Gondola 3D - Dapat diseret/diputar/diperbesar</div>
     </div>
-    
-    <button class="btn-auto" onclick="autoGenerateLayout()">🤖 Auto Konfigurasi (Coba Lagi)</button>
-    <button class="btn-calc" onclick="updateAll()">✨ Perbarui Rak Gondola & Hitung Aksesoris</button>
-    <button style="background:#25D366;color:white;padding:10px;border-radius:12px;margin-bottom:12px;"
-onclick="shareToWhatsApp()">
-  💬 Bagikan ke WhatsApp
-</button>
-
-<button style="background:#128C7E;color:white;padding:10px;border-radius:12px;margin-bottom:12px;"
-onclick="contactOwnerWhatsApp()">
-  📲 Hubungi Saya Langsung
-</button>
-    
-    <div class="result-table">
-      <table id="accessoryTable">
-        <thead>
-          <tr>
-            <th>Jenis</th><th>Tinggi</th><th>Jumlah</th><th>Kaki</th><th>wireMesh</th><th>Tatakan</th><th>Papan28</th><th>Papan33</th><th>Baut</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-          <tr><td colspan="9">Klik tombol untuk menghitung</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="note-info">🛒 Rak Gondola Standar | Pipa hitam + Back panel kawat + Rak putih | Seret mouse untuk memutar | Klik kanan untuk geser | Scroll zoom</div>
   </div>
-  <div class="info-3d">🖱️ Gondola 3D - Dapat diseret/diputar/diperbesar</div>
 
   <script type="importmap">
     { "imports": { "three": "https://unpkg.com/three@0.128.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/" } }
@@ -457,34 +557,21 @@ onclick="contactOwnerWhatsApp()">
       const joinOffset = 0.86;
       const startX = -lengthM/2 + 0.6;
       
-            // 70cm 走道，Single 永遠在最前面與最後面，Double 在中間
+      // 70cm 走道，Single 永遠在最前面與最後面，Double 在中間
       const walkway = 0.70;
-
       const singleFrontZ = -widthM / 2 + 0.275;
       const singleBackZ = widthM / 2 - 0.275;
-
       const middleTop = singleFrontZ + 0.55 + walkway;
       const middleBottom = singleBackZ - 0.55 - walkway;
-
       const doubleRowSpacing = 0.95 + walkway;
-
       const doubleRows = [];
       let currentDoubleZ = middleTop;
-
-      // 原本的 Double Starting
       for (let i = 0; i < ds; i++) {
         if (currentDoubleZ > middleBottom) break;
-
-        doubleRows.push({
-          x: startX,
-          z: currentDoubleZ
-        });
-
+        doubleRows.push({ x: startX, z: currentDoubleZ });
         currentDoubleZ += doubleRowSpacing;
       }
-
-      
-   doubleRows.forEach((row) => {
+      doubleRows.forEach((row) => {
         const rack = createGondolaRack('double', dH);
         rack.position.set(row.x, 0, row.z);
         addRotateHandle(rack, dH);
@@ -504,74 +591,35 @@ onclick="contactOwnerWhatsApp()">
         row.x += joinOffset;
       }
       
-            // Single 永遠在前後兩邊
-const rows = [];
-
-if (ss > 0) {
-  rows.push({
-    x: startX,
-    z: singleFrontZ,
-    count: Math.ceil(ss / 2)
-  });
-}
-
-if (ss > 1) {
-  rows.push({
-    x: startX,
-    z: singleBackZ,
-    count: Math.floor(ss / 2)
-  });
-}
-
-// Single Starting
-rows.forEach((row, index) => {
-  for (let n = 0; n < row.count; n++) {
-    const rack = createGondolaRack('single', sH);
-
-    rack.position.set(row.x, 0, row.z);
-
-    if (index === 0) {
-      rack.rotation.y = 0;
-    }
-
-    if (index === 1) {
-      rack.rotation.y = Math.PI;
-    }
-
-    addRotateHandle(rack, sH);
-    group.add(rack);
-    draggableRacks.push(rack);
-
-    row.x += rackLen;
-  }
-});
-
-// Single Join
-for (let i = 0; i < sj; i++) {
-  if (rows.length === 0) break;
-
-  const rowIndex = i % rows.length;
-  const row = rows[rowIndex];
-
-  const rack = createGondolaRack('single', sH);
-
-  row.x -= (rackLen - joinOffset);
-  rack.position.set(row.x, 0, row.z);
-
-  if (rowIndex === 0) {
-    rack.rotation.y = 0;
-  }
-
-  if (rowIndex === 1) {
-    rack.rotation.y = Math.PI;
-  }
-
-  addRotateHandle(rack, sH);
-  group.add(rack);
-  draggableRacks.push(rack);
-
-  row.x += joinOffset;
-}
+      const rows = [];
+      if (ss > 0) rows.push({ x: startX, z: singleFrontZ, count: Math.ceil(ss / 2) });
+      if (ss > 1) rows.push({ x: startX, z: singleBackZ, count: Math.floor(ss / 2) });
+      rows.forEach((row, index) => {
+        for (let n = 0; n < row.count; n++) {
+          const rack = createGondolaRack('single', sH);
+          rack.position.set(row.x, 0, row.z);
+          if (index === 0) rack.rotation.y = 0;
+          if (index === 1) rack.rotation.y = Math.PI;
+          addRotateHandle(rack, sH);
+          group.add(rack);
+          draggableRacks.push(rack);
+          row.x += rackLen;
+        }
+      });
+      for (let i = 0; i < sj; i++) {
+        if (rows.length === 0) break;
+        const rowIndex = i % rows.length;
+        const row = rows[rowIndex];
+        const rack = createGondolaRack('single', sH);
+        row.x -= (rackLen - joinOffset);
+        rack.position.set(row.x, 0, row.z);
+        if (rowIndex === 0) rack.rotation.y = 0;
+        if (rowIndex === 1) rack.rotation.y = Math.PI;
+        addRotateHandle(rack, sH);
+        group.add(rack);
+        draggableRacks.push(rack);
+        row.x += joinOffset;
+      }
       const floorY = -0.92;
       const borderPts = [
         new THREE.Vector3(-lengthM/2, floorY, -widthM/2),
@@ -602,78 +650,32 @@ for (let i = 0; i < sj; i++) {
       update3DRacks();
     }
     
-    // ========== 智能自動配置 (可一直按，每次隨機生成不同組合) ==========
     function autoGenerateLayout() {
       const panjang = parseFloat(document.getElementById('length').value) || 10;
       const lebar = parseFloat(document.getElementById('width').value) || 7;
-      
-      // 根據長寬計算最大可擺放數量 (預留邊距)
       const rackLength = 0.90;
-const sideMargin = 1.2;
-
-const maxSinglePerRow = Math.max(
-  0,
-  Math.floor((panjang - sideMargin) / rackLength)
-);
-
-const maxDoublePerRow = Math.max(
-  0,
-  Math.floor((panjang - sideMargin) / rackLength)
-);
-      
-      // 隨機決定高度 (偏向150/180較常見)
+      const sideMargin = 1.2;
+      const maxSinglePerRow = Math.max(0, Math.floor((panjang - sideMargin) / rackLength));
+      const maxDoublePerRow = Math.max(0, Math.floor((panjang - sideMargin) / rackLength));
       const heightOptions = [120, 150, 180, 200];
       const randHeight = () => heightOptions[Math.floor(Math.random() * heightOptions.length)];
-      
-      // 隨機產生單面架數量 (Starting + Join)
-      let singleStartQty = 0;
-      let singleJoinQty = 0;
-      let doubleStartQty = 0;
-      let doubleJoinQty = 0;
-      
-      // 計算最多可以有幾排
+      let singleStartQty = 0, singleJoinQty = 0, doubleStartQty = 0, doubleJoinQty = 0;
       const walkway = 0.70;
-
-      // 最少保留前後兩排 Single
-      const maxSingleRows = Math.max(
-        2,
-        Math.floor(lebar / (0.55 + walkway))
-      );
-
-      // Double 只能放在中間，扣掉前後 Single 與走道
-      const usableMiddle =
-        lebar
-        - (0.55 * 2)
-        - (walkway * 2);
-
-      const maxDoubleRows = Math.max(
-        0,
-        Math.floor(usableMiddle / (0.95 + walkway))
-      );      // 單面架
+      const maxSingleRows = Math.max(2, Math.floor(lebar / (0.55 + walkway)));
+      const usableMiddle = lebar - (0.55 * 2) - (walkway * 2);
+      const maxDoubleRows = Math.max(0, Math.floor(usableMiddle / (0.95 + walkway)));
       const singleRowCount = Math.floor(Math.random() * maxSingleRows) + 1;
       singleStartQty = singleRowCount;
-
       let maxSingleJoin = singleRowCount * (maxSinglePerRow - 1);
       maxSingleJoin = Math.max(0, maxSingleJoin);
-
       singleJoinQty = Math.floor(Math.random() * (maxSingleJoin + 1));
-
-      // 雙面架
-      const doubleRowCount =
-        maxDoubleRows > 0
-          ? Math.floor(Math.random() * (maxDoubleRows + 1))
-          : 0;
-
+      const doubleRowCount = maxDoubleRows > 0 ? Math.floor(Math.random() * (maxDoubleRows + 1)) : 0;
       doubleStartQty = doubleRowCount;
       let maxDoubleJoin = doubleRowCount * (maxDoublePerRow - 1);
       maxDoubleJoin = Math.max(0, maxDoubleJoin);
-
-      doubleJoinQty = Math.floor(Math.random() * (maxDoubleJoin + 1));      
-      // 隨機選擇高度 (讓每個貨架類型可能不同，但為了簡化，讓同類型同高度)
+      doubleJoinQty = Math.floor(Math.random() * (maxDoubleJoin + 1));
       const singleHeight = randHeight();
       const doubleHeight = randHeight();
-      
-      // 寫入表單
       document.getElementById('ssQty').value = singleStartQty;
       document.getElementById('sjQty').value = singleJoinQty;
       document.getElementById('dsQty').value = doubleStartQty;
@@ -682,8 +684,6 @@ const maxDoublePerRow = Math.max(
       document.getElementById('sjHeight').value = singleHeight;
       document.getElementById('dsHeight').value = doubleHeight;
       document.getElementById('djHeight').value = doubleHeight;
-      
-      // 觸發更新
       updateAll();
     }
     
@@ -702,7 +702,7 @@ const maxDoublePerRow = Math.max(
       renderer.setSize(w, h);
       labelRenderer.setSize(w, h);
     });
-
+    
     function shareToWhatsApp() {
       const rows = getAllRackData();
       let total = {
@@ -756,19 +756,17 @@ const maxDoublePerRow = Math.max(
       window.open(waUrl, '_blank');
     }
     
-   function contactOwnerWhatsApp() {
-  const message = `Halo, saya melihat website Pekanbaru Display dan ingin bertanya tentang rak gondola. Saya menghubungi dari website konfigurasi gondola.`;
-
-  const waUrl = `https://wa.me/6281291140243?text=${encodeURIComponent(message)}`;
-
-  window.open(waUrl, '_blank');
-}
-
-window.updateAll = updateAll;
-window.shareToWhatsApp = shareToWhatsApp;
-window.contactOwnerWhatsApp = contactOwnerWhatsApp;
-window.autoGenerateLayout = autoGenerateLayout;
-setTimeout(updateAll, 200);
+    function contactOwnerWhatsApp() {
+      const message = `Halo, saya melihat website Pekanbaru Display dan ingin bertanya tentang rak gondola. Saya menghubungi dari website konfigurasi gondola.`;
+      const waUrl = `https://wa.me/6281291140243?text=${encodeURIComponent(message)}`;
+      window.open(waUrl, '_blank');
+    }
+    
+    window.updateAll = updateAll;
+    window.shareToWhatsApp = shareToWhatsApp;
+    window.contactOwnerWhatsApp = contactOwnerWhatsApp;
+    window.autoGenerateLayout = autoGenerateLayout;
+    setTimeout(updateAll, 200);
   </script>
 </body>
 </html>
